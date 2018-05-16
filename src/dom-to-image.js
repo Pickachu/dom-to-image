@@ -352,7 +352,8 @@
             mimeType: mimeType,
             dataAsUrl: dataAsUrl,
             isDataUrl: isDataUrl,
-            canvasToBlob: canvasToBlob,
+			isSrcAsDataUrl: isSrcAsDataUrl,
+			canvasToBlob: canvasToBlob,
             resolveUrl: resolveUrl,
             getAndEncode: getAndEncode,
             uid: uid(),
@@ -401,6 +402,11 @@
             return url.search(/^(data:)/) !== -1;
         }
 
+		function isSrcAsDataUrl(text) {
+			var DATA_URL_REGEX = /url\(['"]?(data:)([^'"]+?)['"]?\)/;
+
+			return text.search(DATA_URL_REGEX) !== -1;
+		}
         function toBlob(canvas) {
             return new Promise(function (resolve) {
                 var binaryString = window.atob(canvas.toDataURL().split(',')[1]);
@@ -615,7 +621,7 @@
         }
 
         function inlineAll(string, baseUrl, get) {
-            if (nothingToInline()) return Promise.resolve(string);
+            if (nothingToInline() || util.isSrcAsDataUrl(string)) return Promise.resolve(string);
 
             return Promise.resolve(string)
                 .then(readUrls)
