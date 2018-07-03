@@ -222,14 +222,21 @@
         });
 
       function cloneStyle() {
-        copyStyle(window.getComputedStyle(original), clone.style);
-
+        var originalStyle = window.getComputedStyle(original);
+        copyStyle(originalStyle, clone.style);
         function copyStyle(source, target) {
-          if (source.cssText) target.cssText = source.cssText;
-          else copyProperties(source, target);
-
+          if (source.cssText) {
+            target.cssText = source.cssText;
+            // add additional copy of composite styles
+            if (source.font) {
+              target.font = source.font;
+            }
+          } else {
+            copyProperties(source, target);
+          }
           function copyProperties(source, target) {
-            util.asArray(source).forEach(function(name) {
+            var propertyKeys = util.asArray(source);
+            propertyKeys.forEach(function(name) {
               target.setProperty(
                 name,
                 source.getPropertyValue(name),
@@ -649,9 +656,9 @@
     }
 
     function inlineAll(string, baseUrl, get) {
-      if (nothingToInline() || util.isSrcAsDataUrl(string))
+      if (nothingToInline() || util.isSrcAsDataUrl(string)) {
         return Promise.resolve(string);
-
+      }
       return Promise.resolve(string)
         .then(readUrls)
         .then(function(urls) {
@@ -718,7 +725,13 @@
               return fetch(sheet.href)
                 .then(toText)
                 .then(setBaseHref(sheet.href))
-                .then(toStyleSheet);
+                .then(toStyleSheet)
+                .catch((err) => {
+                  // Handle any error that occurred in any of the previous
+                  // promises in the chain.
+                  console.log(err)
+                  return sheet;
+                });
             } else {
               return Promise.resolve(sheet);
             }
@@ -797,6 +810,8 @@
                 e.toString()
               );
             }
+          } else {
+            console.log('getCssRules can not fint cssRules')
           }
         });
         return cssRules;
