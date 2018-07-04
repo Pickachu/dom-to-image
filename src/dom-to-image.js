@@ -726,7 +726,7 @@
                 .then(toText)
                 .then(setBaseHref(sheet.href))
                 .then(toStyleSheet)
-                .catch((err) => {
+                .catch(function(err) {
                   // Handle any error that occurred in any of the previous
                   // promises in the chain.
                   console.log(err)
