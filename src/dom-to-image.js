@@ -783,6 +783,7 @@
 
 						return url3.join('/');
 					}
+        }
 
         function toStyleSheet(text) {
           var doc = document.implementation.createHTMLDocument('');
