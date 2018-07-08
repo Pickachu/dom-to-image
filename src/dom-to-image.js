@@ -799,19 +799,19 @@
       function getCssRules(styleSheets) {
         var cssRules = [];
         styleSheets.forEach(function(sheet) {
-          if (sheet.cssRules && typeof sheet.cssRules === 'object') {
-            try {
+          try {
+            if (sheet.cssRules && typeof sheet.cssRules === 'object') {
               util
                 .asArray(sheet.cssRules || [])
                 .forEach(cssRules.push.bind(cssRules));
-            } catch (e) {
-              console.log(
-                'Error while reading CSS rules from ' + sheet.href,
-                e.toString()
-              );
+            } else {
+              console.log('getCssRules can not fint cssRules')
             }
-          } else {
-            console.log('getCssRules can not fint cssRules')
+          } catch (e) {
+            console.log(
+              'Error while reading CSS rules from ' + sheet.href,
+              e.toString()
+            );
           }
         });
         return cssRules;
